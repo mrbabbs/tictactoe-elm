@@ -1,0 +1,15 @@
+{
+  "name": "tictactoe-elm",
+  "version": "1.0.0",
+  "description": "TicTacToe",
+  "main": "index.js",
+  "scripts": {
+    "start": "elm-live src/Main.elm",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Giovanni Esposito <gioesps@gmail.com> (http://mrbabbs.com/)",
+  "license": "MIT",
+  "devDependencies": {
+    "elm-live": "2.7.2"
+  }
+}
