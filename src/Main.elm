@@ -13,7 +13,7 @@ type alias Model =
     { player1 : String
     , player2 : String
     , status : Status
-    , board : List (List (Maybe Marker))
+    , board : List (Maybe Marker)
     , current : Marker
     }
 
@@ -36,28 +36,25 @@ type Msg
 
 
 emptyBorder =
-    [ [ Nothing, Nothing, Nothing ]
-    , [ Nothing, Nothing, Nothing ]
-    , [ Nothing, Nothing, Nothing ]
-    ]
+    List.repeat 9 Nothing
 
 
 model =
     Model "" "" New emptyBorder X
 
 
-mapCell m c idx value =
-    if c == idx then
-        (Just m)
+mark currPlayer idx currIdx cellValue =
+    if idx == currIdx then
+        (Just currPlayer)
     else
-        value
+        cellValue
 
 
-mapRow m r c idx row =
-    if r == idx then
-        List.indexedMap (mapCell c)
+switchPlayer current =
+    if current == X then
+        O
     else
-        row
+        X
 
 
 update msg model =
@@ -74,12 +71,12 @@ update msg model =
         MarkCell rIdx cIdx ->
             { model
                 | board =
-                    (List.indexedMap (mapRow model.current rIdx cIdx) model.board)
-                , current =
-                    if model.current == X then
-                        O
-                    else
-                        X
+                    (.board
+                        >> List.indexedMap (mark model.current <| rIdx + cIdx)
+                    )
+                    <|
+                        model
+                , current = .current >> switchPlayer <| model
             }
 
 
@@ -102,8 +99,21 @@ viewNewGame model =
         ]
 
 
-viewCell rIdx cIdx row =
-    row
+isCell idx el =
+    if Tuple.first el == idx then
+        True
+    else
+        False
+
+
+getItem idx =
+    (List.take (idx + 1) << List.drop idx) >> List.head
+
+
+viewCell board rIdx cIdx =
+    getItem (rIdx + cIdx) board
+        |> Maybe.withDefault ( 0, Nothing )
+        |> Tuple.second
         |> Maybe.map
             (\x -> button [] [ text (toString x) ])
         |> Maybe.withDefault
@@ -113,12 +123,12 @@ viewCell rIdx cIdx row =
             )
 
 
-viewRow idx =
-    div [] << List.indexedMap (viewCell idx)
+viewRow board idx =
+    div [] <| List.map (viewCell board (idx * 3)) <| List.range 0 2
 
 
-viewBorder =
-    div [] << List.indexedMap viewRow << .board
+viewBorder board =
+    div [] <| List.map (viewRow <| List.indexedMap (,) board) <| List.range 0 2
 
 
 view model =
@@ -132,5 +142,5 @@ view model =
                 viewNewGame model
 
             Start ->
-                viewBorder model
+                viewBorder <| .board model
         ]
