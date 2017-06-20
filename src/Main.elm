@@ -3,6 +3,7 @@ module Main exposing (..)
 import Html exposing (Html, text, div, p, input, h1, button, span)
 import Html.Attributes exposing (value)
 import Html.Events exposing (onInput, onClick)
+import Array exposing (Array)
 
 
 main =
@@ -13,7 +14,7 @@ type alias Model =
     { player1 : String
     , player2 : String
     , status : Status
-    , board : List (Maybe Marker)
+    , board : Array (Maybe Marker)
     , current : Marker
     }
 
@@ -36,18 +37,15 @@ type Msg
 
 
 emptyBorder =
-    List.repeat 9 Nothing
+    Array.repeat 9 Nothing
 
 
 model =
     Model "" "" New emptyBorder X
 
 
-mark currPlayer idx currIdx cellValue =
-    if idx == currIdx then
-        (Just currPlayer)
-    else
-        cellValue
+markBoard idx value =
+    Array.set idx value
 
 
 switchPlayer current =
@@ -70,13 +68,8 @@ update msg model =
 
         MarkCell rIdx cIdx ->
             { model
-                | board =
-                    (.board
-                        >> List.indexedMap (mark model.current <| rIdx + cIdx)
-                    )
-                    <|
-                        model
-                , current = .current >> switchPlayer <| model
+                | board = markBoard (rIdx + cIdx) model.current model.board
+                , current = model.current |> switchPlayer
             }
 
 
@@ -111,9 +104,7 @@ getItem idx =
 
 
 viewCell board rIdx cIdx =
-    getItem (rIdx + cIdx) board
-        |> Maybe.withDefault ( 0, Nothing )
-        |> Tuple.second
+    Array.get (rIdx + cIdx) board
         |> Maybe.map
             (\x -> button [] [ text (toString x) ])
         |> Maybe.withDefault
@@ -128,7 +119,7 @@ viewRow board idx =
 
 
 viewBorder board =
-    div [] <| List.map (viewRow <| List.indexedMap (,) board) <| List.range 0 2
+    div [] <| List.map (viewRow board) <| List.range 0 2
 
 
 view model =
