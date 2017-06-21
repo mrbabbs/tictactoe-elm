@@ -10,18 +10,25 @@ main =
     Html.beginnerProgram { model = model, update = update, view = view }
 
 
+type alias Player =
+    String
+
+
 type alias Model =
-    { player1 : String
-    , player2 : String
+    { player1 : Player
+    , player2 : Player
     , status : Status
     , board : Array (Maybe Marker)
     , current : Marker
+    , winner : Maybe Player
+    , remainingTurn : Int
     }
 
 
 type Status
     = New
     | Start
+    | End
 
 
 type Marker
@@ -34,6 +41,7 @@ type Msg
     | UpdatePlayer2 String
     | UpdateStatus Status
     | MarkCell Int
+    | Restart
 
 
 emptyBorder =
@@ -41,7 +49,7 @@ emptyBorder =
 
 
 model =
-    Model "" "" New emptyBorder X
+    Model "" "" New emptyBorder X Nothing 9
 
 
 markBoard idx value =
@@ -53,6 +61,21 @@ switchPlayer current =
         O
     else
         X
+
+
+nextTurn current =
+    current - 1
+
+
+isFinished currentTurn =
+    if currentTurn > 0 then
+        Start
+    else
+        End
+
+
+checkWinner board =
+    Nothing
 
 
 update msg model =
@@ -67,9 +90,25 @@ update msg model =
             { model | status = status }
 
         MarkCell idx ->
+            let
+                newBoard =
+                    markBoard idx model.current model.board
+            in
+                { model
+                    | board = newBoard
+                    , current = model.current |> switchPlayer
+                    , remainingTurn = nextTurn model.remainingTurn
+                    , status = isFinished (nextTurn model.remainingTurn)
+                    , winner = checkWinner newBoard
+                }
+
+        Restart ->
             { model
-                | board = markBoard idx model.current model.board
+                | board = emptyBorder
                 , current = model.current |> switchPlayer
+                , status = Start
+                , winner = Nothing
+                , remainingTurn = 9
             }
 
 
@@ -124,6 +163,13 @@ viewBorder board =
     Array.indexedMap tile board |> createRows |> div []
 
 
+viewLeaderBoard winner =
+    div []
+        [ h1 [] [ text (Maybe.withDefault "Draw" winner) ]
+        , button [ onClick Restart ] [ text "Restart" ]
+        ]
+
+
 view model =
     div []
         [ h1 []
@@ -135,5 +181,8 @@ view model =
                 viewNewGame model
 
             Start ->
-                viewBorder <| .board model
+                viewBorder model.board
+
+            End ->
+                viewLeaderBoard model.winner
         ]
