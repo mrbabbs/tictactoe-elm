@@ -33,7 +33,7 @@ type Msg
     = UpdatePlayer1 String
     | UpdatePlayer2 String
     | UpdateStatus Status
-    | MarkCell Int Int
+    | MarkCell Int
 
 
 emptyBorder =
@@ -45,7 +45,7 @@ model =
 
 
 markBoard idx value =
-    Array.set idx value
+    Array.set idx (Just value)
 
 
 switchPlayer current =
@@ -66,9 +66,9 @@ update msg model =
         UpdateStatus status ->
             { model | status = status }
 
-        MarkCell rIdx cIdx ->
+        MarkCell idx ->
             { model
-                | board = markBoard (rIdx + cIdx) model.current model.board
+                | board = markBoard idx model.current model.board
                 , current = model.current |> switchPlayer
             }
 
@@ -103,23 +103,25 @@ getItem idx =
     (List.take (idx + 1) << List.drop idx) >> List.head
 
 
-viewCell board rIdx cIdx =
-    Array.get (rIdx + cIdx) board
-        |> Maybe.map
-            (\x -> button [] [ text (toString x) ])
-        |> Maybe.withDefault
+tile idx =
+    Maybe.map (\x -> button [] [ text (toString x) ])
+        >> Maybe.withDefault
             (button
-                [ onClick (MarkCell rIdx cIdx) ]
+                [ onClick (MarkCell idx) ]
                 [ text " - " ]
             )
 
 
-viewRow board idx =
-    div [] <| List.map (viewCell board (idx * 3)) <| List.range 0 2
+splitRow list idx =
+    Array.slice (idx * 3) ((idx + 1) * 3) list |> Array.toList |> div []
+
+
+createRows list =
+    Array.map (splitRow list) (Array.fromList [ 0, 1, 2 ]) |> Array.toList
 
 
 viewBorder board =
-    div [] <| List.map (viewRow board) <| List.range 0 2
+    Array.indexedMap tile board |> createRows |> div []
 
 
 view model =
