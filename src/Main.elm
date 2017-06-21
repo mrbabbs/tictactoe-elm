@@ -3,6 +3,7 @@ module Main exposing (..)
 import Html exposing (Html, text, div, p, input, h1, button, span)
 import Html.Attributes exposing (value)
 import Html.Events exposing (onInput, onClick)
+import Array exposing (Array)
 
 
 main =
@@ -13,7 +14,7 @@ type alias Model =
     { player1 : String
     , player2 : String
     , status : Status
-    , board : List (Maybe Marker)
+    , board : Array (Maybe Marker)
     , current : Marker
     }
 
@@ -32,22 +33,19 @@ type Msg
     = UpdatePlayer1 String
     | UpdatePlayer2 String
     | UpdateStatus Status
-    | MarkCell Int Int
+    | MarkCell Int
 
 
 emptyBorder =
-    List.repeat 9 Nothing
+    Array.repeat 9 Nothing
 
 
 model =
     Model "" "" New emptyBorder X
 
 
-mark currPlayer idx currIdx cellValue =
-    if idx == currIdx then
-        (Just currPlayer)
-    else
-        cellValue
+markBoard idx value =
+    Array.set idx (Just value)
 
 
 switchPlayer current =
@@ -68,15 +66,10 @@ update msg model =
         UpdateStatus status ->
             { model | status = status }
 
-        MarkCell rIdx cIdx ->
+        MarkCell idx ->
             { model
-                | board =
-                    (.board
-                        >> List.indexedMap (mark model.current <| rIdx + cIdx)
-                    )
-                    <|
-                        model
-                , current = .current >> switchPlayer <| model
+                | board = markBoard idx model.current model.board
+                , current = model.current |> switchPlayer
             }
 
 
@@ -110,25 +103,25 @@ getItem idx =
     (List.take (idx + 1) << List.drop idx) >> List.head
 
 
-viewCell board rIdx cIdx =
-    getItem (rIdx + cIdx) board
-        |> Maybe.withDefault ( 0, Nothing )
-        |> Tuple.second
-        |> Maybe.map
-            (\x -> button [] [ text (toString x) ])
-        |> Maybe.withDefault
+tile idx =
+    Maybe.map (\x -> button [] [ text (toString x) ])
+        >> Maybe.withDefault
             (button
-                [ onClick (MarkCell rIdx cIdx) ]
+                [ onClick (MarkCell idx) ]
                 [ text " - " ]
             )
 
 
-viewRow board idx =
-    div [] <| List.map (viewCell board (idx * 3)) <| List.range 0 2
+splitRow list idx =
+    Array.slice (idx * 3) ((idx + 1) * 3) list |> Array.toList |> div []
+
+
+createRows list =
+    Array.map (splitRow list) (Array.fromList [ 0, 1, 2 ]) |> Array.toList
 
 
 viewBorder board =
-    div [] <| List.map (viewRow <| List.indexedMap (,) board) <| List.range 0 2
+    Array.indexedMap tile board |> createRows |> div []
 
 
 view model =
