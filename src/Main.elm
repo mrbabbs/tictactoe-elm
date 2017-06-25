@@ -74,8 +74,71 @@ isFinished currentTurn =
         End
 
 
-checkWinner board =
-    Nothing
+checkSolution idxs cell =
+    List.filter (Tuple.first cell |> (==)) idxs
+        |> List.isEmpty
+        |> not
+
+
+verticalSolutions idx =
+    (Array.initialize 3 ((*) 3 >> (+) idx)) |> Array.toList
+
+
+horizontalSolutions idx =
+    (Array.initialize 3 ((*) 3 idx |> (+))) |> Array.toList
+
+
+diagonalSolutions =
+    List.append
+        [ (generateSolution ((*) 4)) ]
+        [ (generateSolution ((*) 2 >> (+) 2)) ]
+
+
+generateSolution =
+    Array.initialize 3 >> Array.toList
+
+
+verifySolution marker board solution =
+    Array.indexedMap (,) board
+        |> Array.filter (Tuple.second >> (==) (Just marker))
+        |> Array.filter (checkSolution solution)
+        |> Array.length
+        |> (==) 3
+
+
+checkHasSolution marker board =
+    let
+        s =
+            List.any (verifySolution marker board) <|
+                List.concat
+                    [ generateSolution verticalSolutions
+                    , generateSolution horizontalSolutions
+                    , diagonalSolutions
+                    ]
+
+        _ =
+            Debug.log "s" s
+    in
+        s
+
+
+checkStatus winner currentTurn =
+    if winner == True then
+        End
+    else
+        isFinished currentTurn
+
+
+chooseWinner p1 p2 current hasWinner =
+    if hasWinner == True then
+        case current of
+            X ->
+                Just p1
+
+            O ->
+                Just p2
+    else
+        Nothing
 
 
 update msg model =
@@ -93,13 +156,24 @@ update msg model =
             let
                 newBoard =
                     markBoard idx model.current model.board
+
+                hasSolution =
+                    checkHasSolution model.current newBoard
             in
                 { model
                     | board = newBoard
-                    , current = model.current |> switchPlayer
                     , remainingTurn = nextTurn model.remainingTurn
-                    , status = isFinished (nextTurn model.remainingTurn)
-                    , winner = checkWinner newBoard
+                    , status =
+                        checkStatus
+                            hasSolution
+                            (nextTurn model.remainingTurn)
+                    , current = switchPlayer model.current
+                    , winner =
+                        chooseWinner
+                            model.player1
+                            model.player2
+                            model.current
+                            hasSolution
                 }
 
         Restart ->
