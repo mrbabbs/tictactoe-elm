@@ -98,28 +98,32 @@ generateSolution =
     Array.initialize 3 >> Array.toList
 
 
+filterByMarker marker =
+    Array.filter (Tuple.second >> (==) (Just marker))
+
+
+filterbySolution solution =
+    Array.filter (checkSolution solution)
+
+
 verifySolution marker board solution =
     Array.indexedMap (,) board
-        |> Array.filter (Tuple.second >> (==) (Just marker))
-        |> Array.filter (checkSolution solution)
+        |> filterByMarker marker
+        |> filterbySolution solution
         |> Array.length
         |> (==) 3
 
 
-checkHasSolution marker board =
-    let
-        s =
-            List.any (verifySolution marker board) <|
-                List.concat
-                    [ generateSolution verticalSolutions
-                    , generateSolution horizontalSolutions
-                    , diagonalSolutions
-                    ]
+gameSolutions =
+    List.concat
+        [ generateSolution verticalSolutions
+        , generateSolution horizontalSolutions
+        , diagonalSolutions
+        ]
 
-        _ =
-            Debug.log "s" s
-    in
-        s
+
+checkHasSolution marker board =
+    List.any (verifySolution marker board) <| gameSolutions
 
 
 checkStatus winner currentTurn =
@@ -129,14 +133,14 @@ checkStatus winner currentTurn =
         isFinished currentTurn
 
 
-chooseWinner p1 p2 current hasWinner =
+chooseWinner player1 player2 current hasWinner =
     if hasWinner == True then
         case current of
             X ->
-                Just p1
+                Just player1
 
             O ->
-                Just p2
+                Just player2
     else
         Nothing
 
@@ -164,9 +168,8 @@ update msg model =
                     | board = newBoard
                     , remainingTurn = nextTurn model.remainingTurn
                     , status =
-                        checkStatus
-                            hasSolution
-                            (nextTurn model.remainingTurn)
+                        nextTurn model.remainingTurn
+                            |> checkStatus hasSolution
                     , current = switchPlayer model.current
                     , winner =
                         chooseWinner
