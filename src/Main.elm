@@ -208,24 +208,17 @@ viewNewGame model =
         ]
 
 
-isCell idx el =
-    if Tuple.first el == idx then
-        True
-    else
-        False
-
-
-getItem idx =
-    (List.take (idx + 1) << List.drop idx) >> List.head
-
-
-tile idx =
+createTile idx =
     Maybe.map (\x -> button [] [ text (toString x) ])
         >> Maybe.withDefault
             (button
                 [ onClick (MarkCell idx) ]
                 [ text " - " ]
             )
+
+
+createTiles =
+    Array.indexedMap createTile
 
 
 splitRow list idx =
@@ -236,8 +229,8 @@ createRows list =
     Array.map (splitRow list) (Array.fromList [ 0, 1, 2 ]) |> Array.toList
 
 
-viewBorder board =
-    Array.indexedMap tile board |> createRows |> div []
+viewBorder =
+    createTiles >> createRows >> div []
 
 
 viewLeaderBoard winner =
