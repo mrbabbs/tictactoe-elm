@@ -244,6 +244,7 @@ viewLeaderBoard winner =
     div []
         [ h1 [] [ text (Maybe.withDefault "Draw" winner) ]
         , button [ onClick Restart ] [ text "Restart" ]
+        , button [ onClick New ] [ text "New" ]
         ]
 
 
