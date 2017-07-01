@@ -37,8 +37,8 @@ type Marker
 
 
 type Msg
-    = UpdatePlayer1 String
-    | UpdatePlayer2 String
+    = UpdatePlayer1 Player
+    | UpdatePlayer2 Player
     | UpdateStatus Status
     | MarkCell Int
     | Restart
