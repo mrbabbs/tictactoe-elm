@@ -205,6 +205,27 @@ validateName name =
     String.length name > 2
 
 
+createTile idx =
+    Maybe.map (\x -> button [] [ text (toString x) ])
+        >> Maybe.withDefault
+            (button
+                [ onClick (MarkCell idx) ]
+                [ text " - " ]
+            )
+
+
+createTiles =
+    Array.indexedMap createTile
+
+
+splitRow list idx =
+    Array.slice (idx * 3) ((idx + 1) * 3) list |> Array.toList |> div []
+
+
+createRows list =
+    Array.map (splitRow list) (Array.fromList [ 0, 1, 2 ]) |> Array.toList
+
+
 viewNewGame model =
     div []
         [ p []
@@ -220,43 +241,14 @@ viewNewGame model =
         ]
 
 
-isCell idx el =
-    if Tuple.first el == idx then
-        True
-    else
-        False
-
-
-getItem idx =
-    (List.take (idx + 1) << List.drop idx) >> List.head
-
-
-tile idx =
-    Maybe.map (\x -> button [] [ text (toString x) ])
-        >> Maybe.withDefault
-            (button
-                [ onClick (MarkCell idx) ]
-                [ text " - " ]
-            )
-
-
-splitRow list idx =
-    Array.slice (idx * 3) ((idx + 1) * 3) list |> Array.toList |> div []
-
-
-createRows list =
-    Array.map (splitRow list) (Array.fromList [ 0, 1, 2 ]) |> Array.toList
-
-
-viewBorder board =
-    Array.indexedMap tile board |> createRows |> div []
+viewBorder =
+    createTiles >> createRows >> div []
 
 
 viewLeaderBoard winner =
     div []
         [ h1 [] [ text (Maybe.withDefault "Draw" winner) ]
         , button [ onClick Restart ] [ text "Restart" ]
-        , button [ onClick New ] [ text "New" ]
         ]
 
 
