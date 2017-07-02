@@ -194,13 +194,11 @@ update msg model =
                 |> switchPlayer
 
         Restart ->
-            { model
-                | board = emptyBorder
-                , current = model.current |> switchPlayer
-                , status = Start
-                , winner = Nothing
-                , remainingTurn = 9
-            }
+            setBoard model emptyBorder
+                |> setStatus Start
+                |> setWinner Nothing
+                |> resetRemainingTurn
+                |> switchPlayer
 
 
 validateName name =
