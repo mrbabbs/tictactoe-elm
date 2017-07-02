@@ -128,7 +128,7 @@ checkHasSolution marker board =
     List.any (verifySolution marker board) <| gameSolutions
 
 
-checkStatus ({ remainingTurn, winner } as model) =
+validateStatus ({ remainingTurn, winner } as model) =
     case winner of
         Just player ->
             setStatus End model
@@ -168,7 +168,7 @@ markCell idx { current, board } =
 validateBoard ({ current, board, remainingTurn, player1, player2 } as model) =
     checkHasSolution current board
         |> chooseWinner model
-        |> checkStatus
+        |> validateStatus
 
 
 resetRemainingTurn model =
