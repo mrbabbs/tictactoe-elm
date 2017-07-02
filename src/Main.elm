@@ -52,19 +52,21 @@ model =
     Model "" "" New emptyBorder X Nothing 9
 
 
-markBoard idx value =
-    Array.set idx (Just value)
+markBoard idx =
+    Just >> Array.set idx
 
 
-switchPlayer current =
-    if current == X then
-        O
-    else
-        X
+switchPlayer model =
+    case model.current of
+        X ->
+            { model | current = O }
+
+        O ->
+            { model | current = X }
 
 
-nextTurn current =
-    current - 1
+nextTurn model =
+    { model | remainingTurn = model.remainingTurn - 1 }
 
 
 isFinished currentTurn =
@@ -126,23 +128,51 @@ checkHasSolution marker board =
     List.any (verifySolution marker board) <| gameSolutions
 
 
-checkStatus winner currentTurn =
-    if winner == True then
-        End
-    else
-        isFinished currentTurn
+checkStatus ({ remainingTurn, winner } as model) =
+    case winner of
+        Just player ->
+            setStatus End model
+
+        Nothing ->
+            setStatus (isFinished remainingTurn) model
 
 
-chooseWinner player1 player2 current hasWinner =
+chooseWinner ({ player1, player2, current } as model) hasWinner =
     if hasWinner == True then
         case current of
             X ->
-                Just player1
+                setWinner (Just player1) model
 
             O ->
-                Just player2
+                setWinner (Just player2) model
     else
-        Nothing
+        setWinner Nothing model
+
+
+setStatus status model =
+    { model | status = status }
+
+
+setWinner winner model =
+    { model | winner = winner }
+
+
+setBoard model newBoard =
+    { model | board = newBoard }
+
+
+markCell idx { current, board } =
+    markBoard idx current board
+
+
+validateBoard ({ current, board, remainingTurn, player1, player2 } as model) =
+    checkHasSolution current board
+        |> chooseWinner model
+        |> checkStatus
+
+
+resetRemainingTurn model =
+    { model | remainingTurn = 9 }
 
 
 update msg model =
@@ -157,27 +187,11 @@ update msg model =
             { model | status = status }
 
         MarkCell idx ->
-            let
-                newBoard =
-                    markBoard idx model.current model.board
-
-                hasSolution =
-                    checkHasSolution model.current newBoard
-            in
-                { model
-                    | board = newBoard
-                    , remainingTurn = nextTurn model.remainingTurn
-                    , status =
-                        nextTurn model.remainingTurn
-                            |> checkStatus hasSolution
-                    , current = switchPlayer model.current
-                    , winner =
-                        chooseWinner
-                            model.player1
-                            model.player2
-                            model.current
-                            hasSolution
-                }
+            markCell idx model
+                |> setBoard model
+                |> nextTurn
+                |> validateBoard
+                |> switchPlayer
 
         Restart ->
             { model
