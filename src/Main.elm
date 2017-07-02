@@ -21,7 +21,7 @@ type alias Model =
     , board : Array (Maybe Marker)
     , current : Marker
     , winner : Maybe Player
-    , remainingTurn : Int
+    , remainingTurns : Int
     }
 
 
@@ -66,7 +66,7 @@ switchPlayer model =
 
 
 nextTurn model =
-    { model | remainingTurn = model.remainingTurn - 1 }
+    { model | remainingTurns = model.remainingTurns - 1 }
 
 
 isFinished currentTurn =
@@ -128,13 +128,13 @@ checkHasSolution marker board =
     List.any (verifySolution marker board) <| gameSolutions
 
 
-validateStatus ({ remainingTurn, winner } as model) =
+validateStatus ({ remainingTurns, winner } as model) =
     case winner of
         Just player ->
             setStatus End model
 
         Nothing ->
-            setStatus (isFinished remainingTurn) model
+            setStatus (isFinished remainingTurns) model
 
 
 chooseWinner ({ player1, player2, current } as model) hasWinner =
@@ -165,14 +165,14 @@ markCell idx { current, board } =
     markBoard idx current board
 
 
-validateBoard ({ current, board, remainingTurn, player1, player2 } as model) =
+validateBoard ({ current, board, remainingTurns, player1, player2 } as model) =
     checkHasSolution current board
         |> chooseWinner model
         |> validateStatus
 
 
 resetRemainingTurn model =
-    { model | remainingTurn = 9 }
+    { model | remainingTurns = 9 }
 
 
 update msg model =
