@@ -10,6 +10,10 @@ main =
     Html.beginnerProgram { model = model, update = update, view = view }
 
 
+
+-- MODEL
+
+
 type alias Player =
     String
 
@@ -36,6 +40,18 @@ type Marker
     | O
 
 
+emptyBorder =
+    Array.repeat 9 Nothing
+
+
+model =
+    Model "" "" New emptyBorder X Nothing 9
+
+
+
+-- UPDATE
+
+
 type Msg
     = UpdatePlayer1 Player
     | UpdatePlayer2 Player
@@ -44,12 +60,30 @@ type Msg
     | Restart
 
 
-emptyBorder =
-    Array.repeat 9 Nothing
+update msg model =
+    case msg of
+        UpdatePlayer1 value ->
+            { model | player1 = value }
 
+        UpdatePlayer2 value ->
+            { model | player2 = value }
 
-model =
-    Model "" "" New emptyBorder X Nothing 9
+        UpdateStatus status ->
+            { model | status = status }
+
+        MarkCell idx ->
+            markCell idx model
+                |> setBoard model
+                |> nextTurn
+                |> validateBoard
+                |> switchPlayer
+
+        Restart ->
+            setBoard model emptyBorder
+                |> setStatus Start
+                |> setWinner Nothing
+                |> resetRemainingTurn
+                |> switchPlayer
 
 
 markBoard idx =
@@ -175,55 +209,26 @@ resetRemainingTurn model =
     { model | remainingTurns = 9 }
 
 
-update msg model =
-    case msg of
-        UpdatePlayer1 value ->
-            { model | player1 = value }
 
-        UpdatePlayer2 value ->
-            { model | player2 = value }
-
-        UpdateStatus status ->
-            { model | status = status }
-
-        MarkCell idx ->
-            markCell idx model
-                |> setBoard model
-                |> nextTurn
-                |> validateBoard
-                |> switchPlayer
-
-        Restart ->
-            setBoard model emptyBorder
-                |> setStatus Start
-                |> setWinner Nothing
-                |> resetRemainingTurn
-                |> switchPlayer
+-- VIEW
 
 
-validateName name =
-    String.length name > 2
+view model =
+    div []
+        [ h1 []
+            [ text
+                (model.player1 ++ " vs " ++ model.player2)
+            ]
+        , case model.status of
+            New ->
+                viewNewGame model
 
+            Start ->
+                viewBorder model.board
 
-createTile idx =
-    Maybe.map (\x -> button [] [ text (toString x) ])
-        >> Maybe.withDefault
-            (button
-                [ onClick (MarkCell idx) ]
-                [ text " - " ]
-            )
-
-
-createTiles =
-    Array.indexedMap createTile
-
-
-splitRow list idx =
-    Array.slice (idx * 3) ((idx + 1) * 3) list |> Array.toList |> div []
-
-
-createRows list =
-    Array.map (splitRow list) (Array.fromList [ 0, 1, 2 ]) |> Array.toList
+            End ->
+                viewLeaderBoard model.winner
+        ]
 
 
 viewNewGame model =
@@ -252,19 +257,26 @@ viewLeaderBoard winner =
         ]
 
 
-view model =
-    div []
-        [ h1 []
-            [ text
-                (model.player1 ++ " vs " ++ model.player2)
-            ]
-        , case model.status of
-            New ->
-                viewNewGame model
+validateName name =
+    String.length name > 2
 
-            Start ->
-                viewBorder model.board
 
-            End ->
-                viewLeaderBoard model.winner
-        ]
+createTile idx =
+    Maybe.map (\x -> button [] [ text (toString x) ])
+        >> Maybe.withDefault
+            (button
+                [ onClick (MarkCell idx) ]
+                [ text " - " ]
+            )
+
+
+createTiles =
+    Array.indexedMap createTile
+
+
+splitRow list idx =
+    Array.slice (idx * 3) ((idx + 1) * 3) list |> Array.toList |> div []
+
+
+createRows list =
+    Array.map (splitRow list) (Array.fromList [ 0, 1, 2 ]) |> Array.toList
