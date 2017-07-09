@@ -1,9 +1,15 @@
 module Main exposing (..)
 
-import Html exposing (Html, text, div, p, input, h1, button, span)
-import Html.Attributes exposing (value)
-import Html.Events exposing (onInput, onClick)
 import Array exposing (Array)
+import Html exposing (Html, button, div, h1, input, p, span, text)
+import Html.Attributes exposing (value)
+import Html.CssHelpers
+import Html.Events exposing (onClick, onInput)
+import MainCss as Styles
+
+
+{ id, class, classList } =
+    Html.CssHelpers.withNamespace Styles.appNamespace
 
 
 main =
