@@ -1,8 +1,8 @@
 module Main exposing (..)
 
 import Array exposing (Array)
-import Html exposing (Html, button, div, h1, input, p, span, text)
-import Html.Attributes exposing (value)
+import Html exposing (Html, button, div, h1, input, label, p, span, text)
+import Html.Attributes exposing (placeholder, value)
 import Html.CssHelpers
 import Html.Events exposing (onClick, onInput)
 import MainCss as Styles
@@ -133,18 +133,18 @@ checkSolution idxs cell =
 
 
 verticalSolutions idx =
-    (Array.initialize 3 ((*) 3 >> (+) idx)) |> Array.toList
+    Array.initialize 3 ((*) 3 >> (+) idx) |> Array.toList
 
 
 horizontalSolutions idx =
-    (Array.initialize 3 ((*) 3 idx |> (+))) |> Array.toList
+    Array.initialize 3 ((*) 3 idx |> (+)) |> Array.toList
 
 
 diagonalSolutions : List (List Cell)
 diagonalSolutions =
     List.append
-        [ (generateSolution ((*) 4)) ]
-        [ (generateSolution ((*) 2 >> (+) 2)) ]
+        [ generateSolution ((*) 4) ]
+        [ generateSolution ((*) 2 >> (+) 2) ]
 
 
 generateSolution : (Int -> a) -> List a
@@ -250,13 +250,9 @@ resetRemainingTurn model =
 
 
 view : Model -> Html Msg
-view model =
-    div []
-        [ h1 []
-            [ text
-                (model.player1 ++ " vs " ++ model.player2)
-            ]
-        , case model.status of
+view ({ status } as model) =
+    div [ class (containerClasses status) ]
+        [ case status of
             New ->
                 viewNewGame model
 
@@ -268,19 +264,64 @@ view model =
         ]
 
 
+containerClasses : Status -> List Styles.CssClasses
+containerClasses status =
+    case status of
+        New ->
+            [ Styles.Container, Styles.Container__NewGameView ]
+
+        Start ->
+            []
+
+        End ->
+            []
+
+
+newGameSubmitClasses : Bool -> List Styles.CssClasses
+newGameSubmitClasses ready =
+    (if ready == True then
+        []
+     else
+        [ Styles.NewGameSubmit__Hidden ]
+    )
+        |> List.append [ Styles.NewGameSubmit ]
+
+
 viewNewGame : Model -> Html Msg
-viewNewGame model =
+viewNewGame { player1, player2 } =
     div []
-        [ p []
-            [ input [ value model.player1, onInput UpdatePlayer1 ] []
+        [ textField player1 "Player X" UpdatePlayer1
+        , div [ class [ Styles.VSLabel ] ] [ text "VS" ]
+        , textField player2 "Player O" UpdatePlayer2
+        , div
+            [ class
+                (validateName player1
+                    && validateName player2
+                    |> newGameSubmitClasses
+                )
             ]
-        , p []
-            [ input [ value model.player2, onInput UpdatePlayer2 ] []
+            [ button
+                [ class [ Styles.Button, Styles.Button__FullWidth ]
+                , onClick (UpdateStatus Start)
+                ]
+                [ text "Start" ]
             ]
-        , if validateName model.player1 && validateName model.player2 then
-            button [ onClick (UpdateStatus Start) ] [ text "Start" ]
-          else
-            text ""
+        ]
+
+
+textField : String -> String -> (String -> Msg) -> Html Msg
+textField val placeholderLabel onInputMsg =
+    div [ class [ Styles.TextField ] ]
+        [ input
+            [ class
+                [ Styles.TextField_InputText
+                , Styles.TextField_InputText__Focus
+                ]
+            , value val
+            , onInput onInputMsg
+            , placeholder placeholderLabel
+            ]
+            []
         ]
 
 
