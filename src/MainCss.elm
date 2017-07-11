@@ -20,7 +20,7 @@ import Css.Namespace exposing (namespace)
 type CssClasses
     = TextField
     | TextField_InputText
-    | TextField_InputText__Focus
+    | TextField_InputText__PlayerO
     | Container
     | Container__NewGameView
     | VSLabel
@@ -56,6 +56,7 @@ resetStyles =
         , fontStyle inherit
         , verticalAlign baseline
         , boxSizing borderBox
+        , outline none
         ]
     , body
         [ lineHeight (num 1)
@@ -111,7 +112,7 @@ vsLabelStyle =
 
 buttonStyle =
     [ class Button
-        [ backgroundColor mediumAcquamarine
+        [ backgroundColor lightKhaki
         , padding (em 0.4)
         , color white
         ]
@@ -127,14 +128,23 @@ textFieldStyle =
         [ display inlineBlock
         ]
     , class TextField_InputText
-        [ borderBottom3 (em 0.1) solid mediumAcquamarine
-        , width (em 7)
+        [ borderBottom3 (em 0.1) solid lightGray
+        , width (em 8)
         , padding (em 0.5)
         , textAlign center
+        , property "transition-property" "border-color"
+        , property "transition-duration" "0.2s"
+        , property "transition-timing-function" "ease-in"
+        , focus
+            [ borderColor mediumAcquamarine
+            ]
+        , pseudoElement "placeholder"
+            [ color (hex "bbbbbb")
+            ]
         ]
-    , class TextField_InputText__Focus
+    , class TextField_InputText__PlayerO
         [ focus
-            [ borderBottom3 (em 0.2) solid mediumAcquamarine
+            [ borderColor vividTangelo
             ]
         ]
     ]
@@ -153,6 +163,10 @@ newGameSubmit =
 
 white =
     hex "ffffff"
+
+
+lightGray =
+    hex "eeeeee"
 
 
 mediumAcquamarine =

@@ -290,9 +290,13 @@ newGameSubmitClasses ready =
 viewNewGame : Model -> Html Msg
 viewNewGame { player1, player2 } =
     div []
-        [ textField player1 "Player X" UpdatePlayer1
+        [ textField player1 [] "Player X" UpdatePlayer1
         , div [ class [ Styles.VSLabel ] ] [ text "VS" ]
-        , textField player2 "Player O" UpdatePlayer2
+        , textField
+            player2
+            [ Styles.TextField_InputText__PlayerO ]
+            "Player O"
+            UpdatePlayer2
         , div
             [ class
                 (validateName player1
@@ -309,14 +313,21 @@ viewNewGame { player1, player2 } =
         ]
 
 
-textField : String -> String -> (String -> Msg) -> Html Msg
-textField val placeholderLabel onInputMsg =
+textField :
+    String
+    -> List Styles.CssClasses
+    -> String
+    -> (String -> Msg)
+    -> Html Msg
+textField val classes placeholderLabel onInputMsg =
     div [ class [ Styles.TextField ] ]
         [ input
             [ class
-                [ Styles.TextField_InputText
-                , Styles.TextField_InputText__Focus
-                ]
+                (List.append
+                    [ Styles.TextField_InputText
+                    ]
+                    classes
+                )
             , value val
             , onInput onInputMsg
             , placeholder placeholderLabel
