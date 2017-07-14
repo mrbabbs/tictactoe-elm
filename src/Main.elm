@@ -366,12 +366,8 @@ textField val classes placeholderLabel onInputMsg isDisabled =
 
 
 createBoard : Array (Maybe Marker) -> Html Msg
-
-
-viewBoard =
-    createTiles
-        >> createRows
-        >> div []
+createBoard =
+    createTiles >> createRows >> div []
 
 
 viewLeaderBoard : Maybe Player -> Html Msg
