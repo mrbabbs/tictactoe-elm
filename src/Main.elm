@@ -1,9 +1,15 @@
 module Main exposing (..)
 
-import Html exposing (Html, text, div, p, input, h1, button, span)
-import Html.Attributes exposing (value)
-import Html.Events exposing (onInput, onClick)
 import Array exposing (Array)
+import Html exposing (Html, button, div, h1, input, label, p, span, text)
+import Html.Attributes exposing (disabled, placeholder, value)
+import Html.CssHelpers
+import Html.Events exposing (onClick, onInput)
+import MainCss as Styles
+
+
+{ id, class, classList } =
+    Html.CssHelpers.withNamespace Styles.appNamespace
 
 
 main =
@@ -48,14 +54,14 @@ type Marker
     | O
 
 
-emptyBorder : Board
-emptyBorder =
+emptyBoard : Board
+emptyBoard =
     Array.repeat 9 Nothing
 
 
 model : Model
 model =
-    Model "" "" New emptyBorder X Nothing 9
+    Model "" "" New emptyBoard X Nothing 9
 
 
 
@@ -90,7 +96,7 @@ update msg model =
                 |> switchPlayer
 
         Restart ->
-            setBoard model emptyBorder
+            setBoard model emptyBoard
                 |> setStatus Start
                 |> setWinner Nothing
                 |> resetRemainingTurn
@@ -127,18 +133,18 @@ checkSolution idxs cell =
 
 
 verticalSolutions idx =
-    (Array.initialize 3 ((*) 3 >> (+) idx)) |> Array.toList
+    Array.initialize 3 ((*) 3 >> (+) idx) |> Array.toList
 
 
 horizontalSolutions idx =
-    (Array.initialize 3 ((*) 3 idx |> (+))) |> Array.toList
+    Array.initialize 3 ((*) 3 idx |> (+)) |> Array.toList
 
 
 diagonalSolutions : List (List Cell)
 diagonalSolutions =
     List.append
-        [ (generateSolution ((*) 4)) ]
-        [ (generateSolution ((*) 2 >> (+) 2)) ]
+        [ generateSolution ((*) 4) ]
+        [ generateSolution ((*) 2 >> (+) 2) ]
 
 
 generateSolution : (Int -> a) -> List a
@@ -244,42 +250,123 @@ resetRemainingTurn model =
 
 
 view : Model -> Html Msg
-view model =
-    div []
-        [ h1 []
-            [ text
-                (model.player1 ++ " vs " ++ model.player2)
+view ({ status, player1, player2, current } as model) =
+    let
+        classesCurrentX =
+            if current == X && status == Start then
+                [ Styles.TextField_InputText__CurrentX ]
+            else
+                []
+
+        classesCurrentO =
+            Styles.TextField_InputText__PlayerO
+                :: (if current == O && status == Start then
+                        [ Styles.TextField_InputText__CurrentO ]
+                    else
+                        []
+                   )
+    in
+    div [ class (containerClasses status) ]
+        [ div []
+            [ textField player1 classesCurrentX "Player X" UpdatePlayer1 (status /= New)
+            , div [ class [ Styles.VSLabel ] ] [ text "VS" ]
+            , textField player2 classesCurrentO "Player O" UpdatePlayer2 (status /= New)
+            , if status == New then
+                div
+                    [ class
+                        (validateName player1
+                            && validateName player2
+                            |> newGameSubmitClasses
+                        )
+                    ]
+                    [ button
+                        [ class [ Styles.Button, Styles.Button__FullWidth ]
+                        , onClick (UpdateStatus Start)
+                        ]
+                        [ text "Start" ]
+                    ]
+              else
+                text ""
             ]
-        , case model.status of
-            New ->
-                viewNewGame model
-
-            Start ->
-                viewBorder model.board
-
-            End ->
+        , viewBoard status model.board
+        , div []
+            [ if status == End then
                 viewLeaderBoard model.winner
+              else
+                text ""
+            ]
         ]
 
 
-viewNewGame : Model -> Html Msg
-viewNewGame model =
-    div []
-        [ p []
-            [ input [ value model.player1, onInput UpdatePlayer1 ] []
-            ]
-        , p []
-            [ input [ value model.player2, onInput UpdatePlayer2 ] []
-            ]
-        , if validateName model.player1 && validateName model.player2 then
-            button [ onClick (UpdateStatus Start) ] [ text "Start" ]
+viewBoard : Status -> Board -> Html Msg
+viewBoard status board =
+    div
+        [ class
+            (if status == Start then
+                [ Styles.Container_BoardGame, Styles.Container_BoardGame__Active ]
+             else
+                [ Styles.Container_BoardGame ]
+            )
+        ]
+        [ if status == Start then
+            createBoard board
           else
             text ""
         ]
 
 
-viewBorder : Array (Maybe Marker) -> Html Msg
-viewBorder =
+containerClasses : Status -> List Styles.CssClasses
+containerClasses status =
+    (case status of
+        New ->
+            [ Styles.Container__NewGameView ]
+
+        Start ->
+            [ Styles.Container__BoardGameView ]
+
+        End ->
+            []
+    )
+        |> (++) [ Styles.Container ]
+
+
+newGameSubmitClasses : Bool -> List Styles.CssClasses
+newGameSubmitClasses ready =
+    (if ready == True then
+        []
+     else
+        [ Styles.NewGameSubmit__Hidden ]
+    )
+        |> List.append [ Styles.NewGameSubmit ]
+
+
+textField :
+    String
+    -> List Styles.CssClasses
+    -> String
+    -> (String -> Msg)
+    -> Bool
+    -> Html Msg
+textField val classes placeholderLabel onInputMsg isDisabled =
+    div [ class [ Styles.TextField ] ]
+        [ input
+            [ class
+                (List.append
+                    [ Styles.TextField_InputText
+                    ]
+                    classes
+                )
+            , value val
+            , onInput onInputMsg
+            , placeholder placeholderLabel
+            , disabled isDisabled
+            ]
+            []
+        ]
+
+
+createBoard : Array (Maybe Marker) -> Html Msg
+createBoard =
     createTiles >> createRows >> div []
 
 

@@ -4,12 +4,24 @@
   "description": "TicTacToe",
   "main": "index.js",
   "scripts": {
-    "start": "elm-live src/Main.elm",
+    "start": "webpack-dev-server --config webpack.config.js --host 0.0.0.0",
+    "postinstall": "elm-package install -y",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Giovanni Esposito <gioesps@gmail.com> (http://mrbabbs.com/)",
   "license": "MIT",
   "devDependencies": {
-    "elm-live": "2.7.2"
-  }
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-preset-env": "^1.6.0",
+    "css-loader": "^0.28.4",
+    "elm": "^0.18.0",
+    "elm-css": "^0.6.1",
+    "elm-css-webpack-loader": "^3.1.0",
+    "elm-webpack-loader": "^4.3.1",
+    "style-loader": "^0.18.2",
+    "webpack": "^3.1.0",
+    "webpack-dev-server": "^2.5.1"
+  },
+  "dependencies": {}
 }
