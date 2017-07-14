@@ -8,6 +8,7 @@ import Css.Elements
         , body
         , footer
         , header
+        , html
         , menu
         , nav
         , ol
@@ -21,8 +22,14 @@ type CssClasses
     = TextField
     | TextField_InputText
     | TextField_InputText__PlayerO
+    | TextField_InputText__CurrentX
+    | TextField_InputText__CurrentO
     | Container
+    | Container_BoardGame
+    | Container_BoardGame__Active
     | Container__NewGameView
+    | Container__BoardGameView
+    | Container_NewGame
     | VSLabel
     | Button
     | Button__FullWidth
@@ -43,8 +50,30 @@ css =
         )
 
 
+type Transition
+    = Property
+    | Duration
+    | TimingFunction
+    | Delay
+
+
 appNamespace =
     "tictactoe"
+
+
+transition kind =
+    case kind of
+        Property ->
+            property "transition-property"
+
+        Duration ->
+            property "transition-duration"
+
+        TimingFunction ->
+            property "transition-timing-function"
+
+        Delay ->
+            property "transition-delay"
 
 
 resetStyles =
@@ -58,10 +87,14 @@ resetStyles =
         , boxSizing borderBox
         , outline none
         ]
+    , html
+        [ height (pct 100)
+        ]
     , body
         [ lineHeight (num 1)
         , fontFamily sansSerif
         , fontSize (px 20)
+        , height (pct 100)
         ]
     , each
         [ article
@@ -89,13 +122,27 @@ resetStyles =
 continerStyle =
     [ class Container
         [ displayFlex
-        , width (pct 100)
+        , flexDirection column
         , height (pct 100)
+        , alignItems center
+        , position relative
+        , paddingTop (px 10)
+        , transition Property "padding-top"
+        , transition Duration "0.4s"
+        , transition TimingFunction "ease"
         ]
     , class Container__NewGameView
-        [ justifyContent center
-        , alignItems center
+        [ property "padding-top" "calc(50vh - 100px)"
         ]
+    , class Container_BoardGame
+        [ opacity zero
+        , property "transition-property" "opacity"
+        , property "transition-duration" "1s"
+        , property "transition-timing-function" "ease"
+        , paddingTop (pct 10)
+        ]
+    , class Container_BoardGame__Active
+        [ opacity (num 1) ]
     ]
 
 
@@ -133,7 +180,7 @@ textFieldStyle =
         , padding (em 0.5)
         , textAlign center
         , property "transition-property" "border-color"
-        , property "transition-duration" "0.2s"
+        , property "transition-duration" "0.1s"
         , property "transition-timing-function" "ease-in"
         , focus
             [ borderColor mediumAcquamarine
@@ -141,11 +188,18 @@ textFieldStyle =
         , pseudoElement "placeholder"
             [ color (hex "bbbbbb")
             ]
+        , disabled [ backgroundColor white ]
         ]
     , class TextField_InputText__PlayerO
         [ focus
             [ borderColor vividTangelo
             ]
+        ]
+    , class TextField_InputText__CurrentO
+        [ borderColor vividTangelo
+        ]
+    , class TextField_InputText__CurrentX
+        [ borderColor mediumAcquamarine
         ]
     ]
 

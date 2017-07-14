@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Array exposing (Array)
 import Html exposing (Html, button, div, h1, input, label, p, span, text)
-import Html.Attributes exposing (placeholder, value)
+import Html.Attributes exposing (disabled, placeholder, value)
 import Html.CssHelpers
 import Html.Events exposing (onClick, onInput)
 import MainCss as Styles
@@ -54,14 +54,14 @@ type Marker
     | O
 
 
-emptyBorder : Board
-emptyBorder =
+emptyBoard : Board
+emptyBoard =
     Array.repeat 9 Nothing
 
 
 model : Model
 model =
-    Model "" "" New emptyBorder X Nothing 9
+    Model "" "" New emptyBoard X Nothing 9
 
 
 
@@ -96,7 +96,7 @@ update msg model =
                 |> switchPlayer
 
         Restart ->
-            setBoard model emptyBorder
+            setBoard model emptyBoard
                 |> setStatus Start
                 |> setWinner Nothing
                 |> resetRemainingTurn
@@ -250,31 +250,84 @@ resetRemainingTurn model =
 
 
 view : Model -> Html Msg
-view ({ status } as model) =
+view ({ status, player1, player2, current } as model) =
+    let
+        classesCurrentX =
+            if current == X && status == Start then
+                [ Styles.TextField_InputText__CurrentX ]
+            else
+                []
+
+        classesCurrentO =
+            Styles.TextField_InputText__PlayerO
+                :: (if current == O && status == Start then
+                        [ Styles.TextField_InputText__CurrentO ]
+                    else
+                        []
+                   )
+    in
     div [ class (containerClasses status) ]
-        [ case status of
-            New ->
-                viewNewGame model
-
-            Start ->
-                viewBorder model.board
-
-            End ->
+        [ div []
+            [ textField player1 classesCurrentX "Player X" UpdatePlayer1 (status /= New)
+            , div [ class [ Styles.VSLabel ] ] [ text "VS" ]
+            , textField player2 classesCurrentO "Player O" UpdatePlayer2 (status /= New)
+            , if status == New then
+                div
+                    [ class
+                        (validateName player1
+                            && validateName player2
+                            |> newGameSubmitClasses
+                        )
+                    ]
+                    [ button
+                        [ class [ Styles.Button, Styles.Button__FullWidth ]
+                        , onClick (UpdateStatus Start)
+                        ]
+                        [ text "Start" ]
+                    ]
+              else
+                text ""
+            ]
+        , viewBoard status model.board
+        , div []
+            [ if status == End then
                 viewLeaderBoard model.winner
+              else
+                text ""
+            ]
+        ]
+
+
+viewBoard : Status -> Board -> Html Msg
+viewBoard status board =
+    div
+        [ class
+            (if status == Start then
+                [ Styles.Container_BoardGame, Styles.Container_BoardGame__Active ]
+             else
+                [ Styles.Container_BoardGame ]
+            )
+        ]
+        [ if status == Start then
+            createBoard board
+          else
+            text ""
         ]
 
 
 containerClasses : Status -> List Styles.CssClasses
 containerClasses status =
-    case status of
+    (case status of
         New ->
-            [ Styles.Container, Styles.Container__NewGameView ]
+            [ Styles.Container__NewGameView ]
 
         Start ->
-            []
+            [ Styles.Container__BoardGameView ]
 
         End ->
             []
+    )
+        |> (++) [ Styles.Container ]
 
 
 newGameSubmitClasses : Bool -> List Styles.CssClasses
@@ -287,39 +340,14 @@ newGameSubmitClasses ready =
         |> List.append [ Styles.NewGameSubmit ]
 
 
-viewNewGame : Model -> Html Msg
-viewNewGame { player1, player2 } =
-    div []
-        [ textField player1 [] "Player X" UpdatePlayer1
-        , div [ class [ Styles.VSLabel ] ] [ text "VS" ]
-        , textField
-            player2
-            [ Styles.TextField_InputText__PlayerO ]
-            "Player O"
-            UpdatePlayer2
-        , div
-            [ class
-                (validateName player1
-                    && validateName player2
-                    |> newGameSubmitClasses
-                )
-            ]
-            [ button
-                [ class [ Styles.Button, Styles.Button__FullWidth ]
-                , onClick (UpdateStatus Start)
-                ]
-                [ text "Start" ]
-            ]
-        ]
-
-
 textField :
     String
     -> List Styles.CssClasses
     -> String
     -> (String -> Msg)
+    -> Bool
     -> Html Msg
-textField val classes placeholderLabel onInputMsg =
+textField val classes placeholderLabel onInputMsg isDisabled =
     div [ class [ Styles.TextField ] ]
         [ input
             [ class
@@ -331,14 +359,19 @@ textField val classes placeholderLabel onInputMsg =
             , value val
             , onInput onInputMsg
             , placeholder placeholderLabel
+            , disabled isDisabled
             ]
             []
         ]
 
 
-viewBorder : Array (Maybe Marker) -> Html Msg
-viewBorder =
-    createTiles >> createRows >> div []
+createBoard : Array (Maybe Marker) -> Html Msg
+
+
+viewBoard =
+    createTiles
+        >> createRows
+        >> div []
 
 
 viewLeaderBoard : Maybe Player -> Html Msg
