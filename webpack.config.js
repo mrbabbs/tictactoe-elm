@@ -27,12 +27,14 @@ module.exports = {
       }, {
         test: /\.elm$/,
         exclude: [/elm-stuff/, /node_modules/, /Stylesheets\.elm$/],
-        use: {
+        use: [{
+          loader: 'elm-hot-loader'
+        }, {
           loader: 'elm-webpack-loader',
           options: {
             debug: true,
           }
-        }
+        }]
       }, {
         test: /Stylesheets\.elm$/,
         use: [
