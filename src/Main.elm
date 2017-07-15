@@ -6,6 +6,7 @@ import Html.Attributes exposing (disabled, placeholder, value)
 import Html.CssHelpers
 import Html.Events exposing (onClick, onInput)
 import MainCss as Styles
+import Util exposing (..)
 
 
 { id, class, classList } =
@@ -253,30 +254,39 @@ view : Model -> Html Msg
 view ({ status, player1, player2, current } as model) =
     let
         classesCurrentX =
-            if current == X && status == Start then
+            classesIf
                 [ Styles.TextField_InputText__CurrentX ]
-            else
-                []
+                (current == X && status == Start)
 
         classesCurrentO =
             Styles.TextField_InputText__PlayerO
-                :: (if current == O && status == Start then
-                        [ Styles.TextField_InputText__CurrentO ]
-                    else
-                        []
-                   )
+                :: classesIf
+                    [ Styles.TextField_InputText__CurrentO ]
+                    (current == O && status == Start)
+
+        ready =
+            validateName player1 && validateName player2
     in
     div [ class (containerClasses status) ]
         [ div []
-            [ textField player1 classesCurrentX "Player X" UpdatePlayer1 (status /= New)
+            [ textField player1
+                classesCurrentX
+                "Player X"
+                UpdatePlayer1
+                (status /= New)
             , div [ class [ Styles.VSLabel ] ] [ text "VS" ]
-            , textField player2 classesCurrentO "Player O" UpdatePlayer2 (status /= New)
-            , if status == New then
-                div
+            , textField player2
+                classesCurrentO
+                "Player O"
+                UpdatePlayer2
+                (status /= New)
+            , viewIf
+                (div
                     [ class
-                        (validateName player1
-                            && validateName player2
-                            |> newGameSubmitClasses
+                        (Styles.NewGameSubmit
+                            :: classesIf
+                                [ Styles.NewGameSubmit__Hidden ]
+                                (not ready)
                         )
                     ]
                     [ button
@@ -285,8 +295,8 @@ view ({ status, player1, player2, current } as model) =
                         ]
                         [ text "Start" ]
                     ]
-              else
-                text ""
+                )
+                (status == New)
             ]
         , viewBoard status model.board
         , div []
@@ -302,17 +312,13 @@ viewBoard : Status -> Board -> Html Msg
 viewBoard status board =
     div
         [ class
-            (if status == Start then
-                [ Styles.Container_BoardGame, Styles.Container_BoardGame__Active ]
-             else
-                [ Styles.Container_BoardGame ]
+            (Styles.Container_BoardGame
+                :: classesIf
+                    [ Styles.Container_BoardGame__Active ]
+                    (status == Start)
             )
         ]
-        [ if status == Start then
-            createBoard board
-          else
-            text ""
-        ]
+        [ viewIf (createBoard board) (status == Start) ]
 
 
 containerClasses : Status -> List Styles.CssClasses
@@ -328,16 +334,6 @@ containerClasses status =
             []
     )
         |> (++) [ Styles.Container ]
-
-
-newGameSubmitClasses : Bool -> List Styles.CssClasses
-newGameSubmitClasses ready =
-    (if ready == True then
-        []
-     else
-        [ Styles.NewGameSubmit__Hidden ]
-    )
-        |> List.append [ Styles.NewGameSubmit ]
 
 
 textField :
@@ -367,7 +363,7 @@ textField val classes placeholderLabel onInputMsg isDisabled =
 
 createBoard : Array (Maybe Marker) -> Html Msg
 createBoard =
-    createTiles >> createRows >> div []
+    createTiles >> createRows >> div [ class [ Styles.Board ] ]
 
 
 viewLeaderBoard : Maybe Player -> Html Msg
@@ -385,11 +381,28 @@ validateName name =
 
 createTile : Cell -> Maybe Marker -> Html Msg
 createTile idx =
-    Maybe.map (\x -> button [] [ text (toString x) ])
+    Maybe.map
+        (\marker ->
+            let
+                markerClasses =
+                    Styles.Tile_Marker
+                        :: (case marker of
+                                X ->
+                                    [ Styles.Tile_Marker__X ]
+
+                                O ->
+                                    [ Styles.Tile_Marker__O ]
+                           )
+            in
+            button [ class [ Styles.Tile ] ]
+                [ span [ class markerClasses ]
+                    [ text "" ]
+                ]
+        )
         >> Maybe.withDefault
             (button
-                [ onClick (MarkCell idx) ]
-                [ text " - " ]
+                [ class [ Styles.Tile ], onClick (MarkCell idx) ]
+                [ text "" ]
             )
 
 
@@ -400,7 +413,9 @@ createTiles =
 
 splitRow : Array (Html Msg) -> Int -> Html Msg
 splitRow list idx =
-    Array.slice (idx * 3) ((idx + 1) * 3) list |> Array.toList |> div []
+    Array.slice (idx * 3) ((idx + 1) * 3) list
+        |> Array.toList
+        |> div [ class [ Styles.Board_Row ] ]
 
 
 createRows : Array (Html Msg) -> List (Html Msg)
