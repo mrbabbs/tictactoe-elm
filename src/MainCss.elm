@@ -35,6 +35,12 @@ type CssClasses
     | Button__FullWidth
     | NewGameSubmit
     | NewGameSubmit__Hidden
+    | Board
+    | Board_Row
+    | Tile
+    | Tile_Marker
+    | Tile_Marker__X
+    | Tile_Marker__O
 
 
 css =
@@ -46,6 +52,7 @@ css =
             , vsLabelStyle
             , newGameSubmit
             , buttonStyle
+            , boardStyle
             ]
         )
 
@@ -126,20 +133,23 @@ continerStyle =
         , height (pct 100)
         , alignItems center
         , position relative
-        , paddingTop (px 10)
+        , paddingTop (em 0.6)
         , transition Property "padding-top"
         , transition Duration "0.4s"
         , transition TimingFunction "ease"
         ]
     , class Container__NewGameView
-        [ property "padding-top" "calc(50vh - 100px)"
+        [ property "padding-top" "calc(50vh - 5em)"
         ]
     , class Container_BoardGame
         [ opacity zero
         , property "transition-property" "opacity"
         , property "transition-duration" "1s"
         , property "transition-timing-function" "ease"
-        , paddingTop (pct 10)
+        , paddingTop (em 6.5)
+        , width (pct 100)
+        , displayFlex
+        , justifyContent center
         ]
     , class Container_BoardGame__Active
         [ opacity (num 1) ]
@@ -170,12 +180,59 @@ buttonStyle =
     ]
 
 
+boardStyle =
+    [ class Board
+        [ maxWidth (em 25)
+        , displayFlex
+        , flexDirection column
+        ]
+    , class Tile
+        [ display block
+        , width (em 7)
+        , height (em 7)
+        , backgroundColor white
+        , nthChild "3n+1"
+            [ borderRight3 borderTileWidth borderTileStyle borderTileColor
+            ]
+        , nthChild "3n"
+            [ borderLeft3 borderTileWidth borderTileStyle borderTileColor
+            ]
+        ]
+    , class Tile_Marker
+        [ fontSize (em 5)
+        , cursor pointer
+        , display block
+        ]
+    , class Tile_Marker__X
+        [ color mediumAcquamarine
+        , fontSize (em 6)
+        , transform (rotate (deg 45))
+        , after [ property "content" (toString "+") ]
+        ]
+    , class Tile_Marker__O
+        [ color vividTangelo
+        , after [ property "content" (toString "o") ]
+        , paddingBottom (em 0.1)
+        ]
+    , class Board_Row
+        [ displayFlex
+        , justifyContent center
+        , nthChild "1"
+            [ borderBottom3 borderTileWidth borderTileStyle borderTileColor
+            ]
+        , nthChild "2"
+            [ borderBottom3 borderTileWidth borderTileStyle borderTileColor
+            ]
+        ]
+    ]
+
+
 textFieldStyle =
     [ class TextField
         [ display inlineBlock
         ]
     , class TextField_InputText
-        [ borderBottom3 (em 0.1) solid lightGray
+        [ borderBottom3 (em 0.1) solid grayColor100
         , width (em 8)
         , padding (em 0.5)
         , textAlign center
@@ -186,7 +243,7 @@ textFieldStyle =
             [ borderColor mediumAcquamarine
             ]
         , pseudoElement "placeholder"
-            [ color (hex "bbbbbb")
+            [ color grayColor200
             ]
         , disabled [ backgroundColor white ]
         ]
@@ -219,8 +276,12 @@ white =
     hex "ffffff"
 
 
-lightGray =
+grayColor100 =
     hex "eeeeee"
+
+
+grayColor200 =
+    hex "bbbbbb"
 
 
 mediumAcquamarine =
@@ -241,3 +302,15 @@ vividTangelo =
 
 yellowGreen =
     hex "95c126"
+
+
+borderTileColor =
+    grayColor200
+
+
+borderTileWidth =
+    em 0.05
+
+
+borderTileStyle =
+    solid

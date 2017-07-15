@@ -363,7 +363,7 @@ textField val classes placeholderLabel onInputMsg isDisabled =
 
 createBoard : Array (Maybe Marker) -> Html Msg
 createBoard =
-    createTiles >> createRows >> div []
+    createTiles >> createRows >> div [ class [ Styles.Board ] ]
 
 
 viewLeaderBoard : Maybe Player -> Html Msg
@@ -381,11 +381,28 @@ validateName name =
 
 createTile : Cell -> Maybe Marker -> Html Msg
 createTile idx =
-    Maybe.map (\x -> button [] [ text (toString x) ])
+    Maybe.map
+        (\marker ->
+            let
+                markerClasses =
+                    Styles.Tile_Marker
+                        :: (case marker of
+                                X ->
+                                    [ Styles.Tile_Marker__X ]
+
+                                O ->
+                                    [ Styles.Tile_Marker__O ]
+                           )
+            in
+            button [ class [ Styles.Tile ] ]
+                [ span [ class markerClasses ]
+                    [ text "" ]
+                ]
+        )
         >> Maybe.withDefault
             (button
-                [ onClick (MarkCell idx) ]
-                [ text " - " ]
+                [ class [ Styles.Tile ], onClick (MarkCell idx) ]
+                [ text "" ]
             )
 
 
@@ -396,7 +413,9 @@ createTiles =
 
 splitRow : Array (Html Msg) -> Int -> Html Msg
 splitRow list idx =
-    Array.slice (idx * 3) ((idx + 1) * 3) list |> Array.toList |> div []
+    Array.slice (idx * 3) ((idx + 1) * 3) list
+        |> Array.toList
+        |> div [ class [ Styles.Board_Row ] ]
 
 
 createRows : Array (Html Msg) -> List (Html Msg)
