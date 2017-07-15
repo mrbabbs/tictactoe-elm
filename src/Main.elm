@@ -1,8 +1,8 @@
 module Main exposing (..)
 
 import Array exposing (Array)
-import Html exposing (Html, button, div, h1, input, label, p, span, text)
-import Html.Attributes exposing (disabled, placeholder, value)
+import Html exposing (Html, button, div, h1, i, input, label, p, span, text)
+import Html.Attributes exposing (disabled, placeholder, src, value)
 import Html.CssHelpers
 import Html.Events exposing (onClick, onInput)
 import MainCss as Styles
@@ -101,7 +101,6 @@ update msg model =
                 |> setStatus Start
                 |> setWinner Nothing
                 |> resetRemainingTurn
-                |> switchPlayer
 
 
 switchPlayer : Model -> Model
@@ -299,12 +298,15 @@ view ({ status, player1, player2, current } as model) =
                 (status == New)
             ]
         , viewBoard status model.board
-        , div []
-            [ if status == End then
-                viewLeaderBoard model.winner
-              else
-                text ""
+        , div
+            [ class
+                (Styles.Container__LeaderBoard
+                    :: classesIf
+                        [ Styles.Container__LeaderBoard__Active ]
+                        (status == End)
+                )
             ]
+            [ viewIf (viewLeaderBoard current model.winner) (status == End) ]
         ]
 
 
@@ -331,7 +333,7 @@ containerClasses status =
             [ Styles.Container__BoardGameView ]
 
         End ->
-            []
+            [ Styles.Container__LeaderBoardView ]
     )
         |> (++) [ Styles.Container ]
 
@@ -366,11 +368,42 @@ createBoard =
     createTiles >> createRows >> div [ class [ Styles.Board ] ]
 
 
-viewLeaderBoard : Maybe Player -> Html Msg
-viewLeaderBoard winner =
-    div []
-        [ h1 [] [ text (Maybe.withDefault "Draw" winner) ]
-        , button [ onClick Restart ] [ text "Restart" ]
+viewLeaderBoard : Marker -> Maybe Player -> Html Msg
+viewLeaderBoard marker winner =
+    let
+        winnerClasses =
+            case marker of
+                X ->
+                    [ Styles.LeaderBoard__O ]
+
+                O ->
+                    [ Styles.LeaderBoard__X ]
+
+        leaderBoardClasses =
+            Styles.LeaderBoard
+                :: (case winner of
+                        Nothing ->
+                            []
+
+                        Just player ->
+                            winnerClasses
+                   )
+    in
+    div [ class leaderBoardClasses ]
+        [ h1 [ class [ Styles.LeaderBoard_Winner ] ]
+            [ text (Maybe.withDefault "Draw" winner) ]
+        , div [ class [ Styles.LeaderBoard_Trofy ] ]
+            [ i
+                [ Html.Attributes.class "fa"
+                , Html.Attributes.class "fa-trophy"
+                ]
+                []
+            ]
+        , button
+            [ class [ Styles.Button, Styles.Button__FullWidth ]
+            , onClick Restart
+            ]
+            [ text "Restart" ]
         ]
 
 

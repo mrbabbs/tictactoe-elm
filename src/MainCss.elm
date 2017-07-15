@@ -29,12 +29,20 @@ type CssClasses
     | Container_BoardGame__Active
     | Container__NewGameView
     | Container__BoardGameView
+    | Container__LeaderBoardView
     | Container_NewGame
+    | Container__LeaderBoard
+    | Container__LeaderBoard__Active
     | VSLabel
     | Button
     | Button__FullWidth
     | NewGameSubmit
     | NewGameSubmit__Hidden
+    | LeaderBoard
+    | LeaderBoard__O
+    | LeaderBoard__X
+    | LeaderBoard_Winner
+    | LeaderBoard_Trofy
     | Board
     | Board_Row
     | Tile
@@ -53,6 +61,7 @@ css =
             , newGameSubmit
             , buttonStyle
             , boardStyle
+            , leaderBoardStyle
             ]
         )
 
@@ -141,18 +150,31 @@ continerStyle =
     , class Container__NewGameView
         [ property "padding-top" "calc(50vh - 5em)"
         ]
+    , class Container__LeaderBoardView
+        [ property "padding-top" "calc(50vh - 7.5em)"
+        ]
     , class Container_BoardGame
         [ opacity zero
         , property "transition-property" "opacity"
         , property "transition-duration" "1s"
         , property "transition-timing-function" "ease"
-        , paddingTop (em 6.5)
         , width (pct 100)
         , displayFlex
         , justifyContent center
         ]
     , class Container_BoardGame__Active
-        [ opacity (num 1) ]
+        [ opacity (num 1), paddingTop (em 6.5) ]
+    , class Container__LeaderBoard
+        [ opacity zero
+        , property "transition-property" "opacity"
+        , property "transition-duration" "1s"
+        , property "transition-timing-function" "ease"
+        , width (pct 100)
+        , displayFlex
+        , justifyContent center
+        ]
+    , class Container__LeaderBoard__Active
+        [ opacity (num 1), paddingTop (em 1) ]
     ]
 
 
@@ -177,6 +199,23 @@ buttonStyle =
         [ width (pct 100)
         , cursor pointer
         ]
+    ]
+
+
+leaderBoardStyle =
+    [ class LeaderBoard
+        [ width (em 21)
+        , displayFlex
+        , flexDirection column
+        , alignItems center
+        ]
+    , class LeaderBoard_Trofy
+        [ important (fontSize (em 3))
+        , paddingBottom (em 0.5)
+        ]
+    , class LeaderBoard_Winner [ padding (em 0.5) ]
+    , class LeaderBoard__O [ color vividTangelo ]
+    , class LeaderBoard__X [ color mediumAcquamarine ]
     ]
 
 
