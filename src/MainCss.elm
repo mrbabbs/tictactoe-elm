@@ -137,6 +137,9 @@ resetStyles =
         [ borderCollapse collapse
         , property "border-spacing" "0"
         ]
+    , mediaQuery "(max-width: 472px)"
+        [ body [ fontSize (px 14) ]
+        ]
     ]
 
 
@@ -144,7 +147,7 @@ continerStyle =
     [ class Container
         [ displayFlex
         , flexDirection column
-        , height (pct 100)
+        , minHeight (pct 100)
         , alignItems center
         , position relative
         , paddingTop (em 0.6)
@@ -166,9 +169,14 @@ continerStyle =
         , width (pct 100)
         , displayFlex
         , justifyContent center
+        , alignItems center
         ]
     , class Container_BoardGame__Active
-        [ opacity (num 1), paddingTop (em 6.5), flexGrow (num 1) ]
+        [ opacity (num 1)
+        , paddingTop (em 1)
+        , paddingBottom (em 1)
+        , flexGrow (num 1)
+        ]
     , class Container__LeaderBoard
         [ opacity zero
         , property "transition-property" "opacity"
@@ -188,7 +196,7 @@ footerStyles =
     [ class Footer
         [ flexGrow zero
         , flexShrink zero
-        , padding2 (em 0.5) (em 7)
+        , padding2 (em 0.5) (em 5)
         , color grayColor200
         , fontSize (em 0.9)
         , borderTop3 (em 0.05) solid grayColor200
