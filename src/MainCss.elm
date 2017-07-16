@@ -114,7 +114,6 @@ resetStyles =
     , body
         [ lineHeight (num 1)
         , fontFamily sansSerif
-        , fontSize (px 20)
         , height (pct 100)
         ]
     , each
@@ -137,9 +136,6 @@ resetStyles =
         [ borderCollapse collapse
         , property "border-spacing" "0"
         ]
-    , mediaQuery "(max-width: 472px)"
-        [ body [ fontSize (px 14) ]
-        ]
     ]
 
 
@@ -148,6 +144,7 @@ continerStyle =
         [ displayFlex
         , flexDirection column
         , minHeight (pct 100)
+        , fontSize (px 20)
         , alignItems center
         , position relative
         , paddingTop (em 0.6)
@@ -173,9 +170,8 @@ continerStyle =
         ]
     , class Container_BoardGame__Active
         [ opacity (num 1)
-        , paddingTop (em 1)
-        , paddingBottom (em 1)
         , flexGrow (num 1)
+        , padding2 (em 1) zero
         ]
     , class Container__LeaderBoard
         [ opacity zero
@@ -187,8 +183,17 @@ continerStyle =
         , justifyContent center
         ]
     , class Container__LeaderBoard__Active
-        [ opacity (num 1), paddingTop (em 1), flexGrow (num 1) ]
+        [ opacity (num 1)
+        , padding2 (em 1) zero
+        , flexGrow (num 1)
+        ]
     , class Container_NewGame__Active [ flexGrow (num 1) ]
+    , mediaQuery "(max-width: 472px)"
+        [ class Container [ fontSize (px 14) ]
+        ]
+    , mediaQuery "(max-height: 420px)"
+        [ class Container [ fontSize (px 14) ]
+        ]
     ]
 
 
