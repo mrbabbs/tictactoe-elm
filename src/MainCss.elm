@@ -30,7 +30,7 @@ type CssClasses
     | Container__NewGameView
     | Container__BoardGameView
     | Container__LeaderBoardView
-    | Container_NewGame
+    | Container_NewGame__Active
     | Container__LeaderBoard
     | Container__LeaderBoard__Active
     | VSLabel
@@ -49,6 +49,9 @@ type CssClasses
     | Tile_Marker
     | Tile_Marker__X
     | Tile_Marker__O
+    | Footer
+    | Footer_Img
+    | Link
 
 
 css =
@@ -62,6 +65,8 @@ css =
             , buttonStyle
             , boardStyle
             , leaderBoardStyle
+            , footerStyles
+            , linkStyles
             ]
         )
 
@@ -163,7 +168,7 @@ continerStyle =
         , justifyContent center
         ]
     , class Container_BoardGame__Active
-        [ opacity (num 1), paddingTop (em 6.5) ]
+        [ opacity (num 1), paddingTop (em 6.5), flexGrow (num 1) ]
     , class Container__LeaderBoard
         [ opacity zero
         , property "transition-property" "opacity"
@@ -174,7 +179,33 @@ continerStyle =
         , justifyContent center
         ]
     , class Container__LeaderBoard__Active
-        [ opacity (num 1), paddingTop (em 1) ]
+        [ opacity (num 1), paddingTop (em 1), flexGrow (num 1) ]
+    , class Container_NewGame__Active [ flexGrow (num 1) ]
+    ]
+
+
+footerStyles =
+    [ class Footer
+        [ flexGrow zero
+        , flexShrink zero
+        , padding2 (em 0.5) (em 7)
+        , color grayColor200
+        , fontSize (em 0.9)
+        , borderTop3 (em 0.05) solid grayColor200
+        ]
+    , class Footer_Img
+        [ height (em 0.9)
+        , paddingRight (em 0.3)
+        ]
+    ]
+
+
+linkStyles =
+    [ class Link
+        [ visited [ color grayColor200 ]
+        , hover [ color mediumAcquamarine ]
+        , textDecoration none
+        ]
     ]
 
 
