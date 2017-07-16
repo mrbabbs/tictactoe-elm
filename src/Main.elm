@@ -334,9 +334,12 @@ view ({ status, player1, player2, current } as model) =
             , a [ href "http://elm-lang.org", class [ Styles.Link ] ]
                 [ text "elm"
                 ]
-            , text ". author "
-            , a [ href "http://mrbabbs.com", class [ Styles.Link ] ]
-                [ text "mrbabbs" ]
+            , text ", source code "
+            , a
+                [ href "https://github.com/mrbabbs/tictactoe-elm"
+                , class [ Styles.Link ]
+                ]
+                [ text "github" ]
             ]
         ]
 

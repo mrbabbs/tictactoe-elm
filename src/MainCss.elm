@@ -215,7 +215,8 @@ footerStyles =
 
 linkStyles =
     [ class Link
-        [ visited [ color grayColor200 ]
+        [ color grayColor200
+        , visited [ color grayColor200 ]
         , hover [ color blueColor100 ]
         , textDecoration none
         ]
