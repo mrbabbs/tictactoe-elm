@@ -1,8 +1,22 @@
 module Main exposing (..)
 
 import Array exposing (Array)
-import Html exposing (Html, button, div, h1, i, input, label, p, span, text)
-import Html.Attributes exposing (disabled, placeholder, src, value)
+import Html
+    exposing
+        ( Html
+        , a
+        , button
+        , div
+        , footer
+        , h1
+        , i
+        , img
+        , input
+        , label
+        , span
+        , text
+        )
+import Html.Attributes exposing (disabled, href, placeholder, src, value)
 import Html.CssHelpers
 import Html.Events exposing (onClick, onInput)
 import MainCss as Styles
@@ -267,7 +281,10 @@ view ({ status, player1, player2, current } as model) =
             validateName player1 && validateName player2
     in
     div [ class (containerClasses status) ]
-        [ div []
+        [ div
+            [ class
+                (classesIf [ Styles.Container_NewGame__Active ] (status == New))
+            ]
             [ textField player1
                 classesCurrentX
                 "Player X"
@@ -307,6 +324,20 @@ view ({ status, player1, player2, current } as model) =
                 )
             ]
             [ viewIf (viewLeaderBoard current model.winner) (status == End) ]
+        , footer [ class [ Styles.Footer ] ]
+            [ text "written in "
+            , img
+                [ class [ Styles.Footer_Img ]
+                , src "http://package.elm-lang.org/assets/favicon.ico"
+                ]
+                []
+            , a [ href "http://elm-lang.org", class [ Styles.Link ] ]
+                [ text "elm"
+                ]
+            , text ". author "
+            , a [ href "http://mrbabbs.com", class [ Styles.Link ] ]
+                [ text "mrbabbs" ]
+            ]
         ]
 
 
