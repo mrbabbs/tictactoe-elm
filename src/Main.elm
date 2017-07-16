@@ -20,6 +20,7 @@ import Html.Attributes exposing (disabled, href, placeholder, src, value)
 import Html.CssHelpers
 import Html.Events exposing (onClick, onInput)
 import MainCss as Styles
+import Model exposing (..)
 import Util exposing (..)
 
 
@@ -32,63 +33,7 @@ main =
 
 
 
--- MODEL
-
-
-type alias Player =
-    String
-
-
-type alias Model =
-    { player1 : Player
-    , player2 : Player
-    , status : Status
-    , board : Board
-    , current : Marker
-    , winner : Maybe Player
-    , remainingTurns : Int
-    }
-
-
-type alias Cell =
-    Int
-
-
-type alias Board =
-    Array (Maybe Marker)
-
-
-type Status
-    = New
-    | Start
-    | End
-
-
-type Marker
-    = X
-    | O
-
-
-emptyBoard : Board
-emptyBoard =
-    Array.repeat 9 Nothing
-
-
-model : Model
-model =
-    Model "" "" New emptyBoard X Nothing 9
-
-
-
 -- UPDATE
-
-
-type Msg
-    = UpdatePlayer1 Player
-    | UpdatePlayer2 Player
-    | UpdateStatus Status
-    | MarkCell Cell
-    | Restart
 
 
 update : Msg -> Model -> Model
