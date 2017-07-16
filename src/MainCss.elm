@@ -203,7 +203,7 @@ footerStyles =
 linkStyles =
     [ class Link
         [ visited [ color grayColor200 ]
-        , hover [ color mediumAcquamarine ]
+        , hover [ color greenColor100 ]
         , textDecoration none
         ]
     ]
@@ -245,8 +245,8 @@ leaderBoardStyle =
         , paddingBottom (em 0.5)
         ]
     , class LeaderBoard_Winner [ padding (em 0.5) ]
-    , class LeaderBoard__O [ color vividTangelo ]
-    , class LeaderBoard__X [ color mediumAcquamarine ]
+    , class LeaderBoard__O [ color playerOColor ]
+    , class LeaderBoard__X [ color playerXColor ]
     ]
 
 
@@ -274,13 +274,13 @@ boardStyle =
         , display block
         ]
     , class Tile_Marker__X
-        [ color mediumAcquamarine
+        [ color playerXColor
         , fontSize (em 6)
         , transform (rotate (deg 45))
         , after [ property "content" (toString "+") ]
         ]
     , class Tile_Marker__O
-        [ color vividTangelo
+        [ color playerOColor
         , after [ property "content" (toString "o") ]
         , paddingBottom (em 0.1)
         ]
@@ -310,7 +310,7 @@ textFieldStyle =
         , property "transition-duration" "0.1s"
         , property "transition-timing-function" "ease-in"
         , focus
-            [ borderColor mediumAcquamarine
+            [ borderColor playerXColor
             ]
         , pseudoElement "placeholder"
             [ color grayColor200
@@ -319,14 +319,14 @@ textFieldStyle =
         ]
     , class TextField_InputText__PlayerO
         [ focus
-            [ borderColor vividTangelo
+            [ borderColor playerOColor
             ]
         ]
     , class TextField_InputText__CurrentO
-        [ borderColor vividTangelo
+        [ borderColor playerOColor
         ]
     , class TextField_InputText__CurrentX
-        [ borderColor mediumAcquamarine
+        [ borderColor playerXColor
         ]
     ]
 
@@ -354,24 +354,24 @@ grayColor200 =
     hex "bbbbbb"
 
 
-mediumAcquamarine =
+greenColor100 =
     hex "5dd39e"
 
 
-mediumSpringBud =
-    hex "bce784"
+orangeColor100 =
+    hex "f77022"
+
+
+playerXColor =
+    greenColor100
+
+
+playerOColor =
+    orangeColor100
 
 
 lightKhaki =
     hex "e6e18f"
-
-
-vividTangelo =
-    hex "f77022"
-
-
-yellowGreen =
-    hex "95c126"
 
 
 borderTileColor =
