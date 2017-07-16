@@ -46,6 +46,7 @@ module.exports = {
     ]
   },
   devServer: {
-    inline: true
+    inline: true,
+    contentBase: './src'
   }
 };
