@@ -203,7 +203,7 @@ footerStyles =
 linkStyles =
     [ class Link
         [ visited [ color grayColor200 ]
-        , hover [ color greenColor100 ]
+        , hover [ color blueColor100 ]
         , textDecoration none
         ]
     ]
@@ -222,7 +222,7 @@ vsLabelStyle =
 
 buttonStyle =
     [ class Button
-        [ backgroundColor lightKhaki
+        [ backgroundColor blueColor100
         , padding (em 0.4)
         , color white
         ]
@@ -360,6 +360,10 @@ greenColor100 =
 
 orangeColor100 =
     hex "f77022"
+
+
+blueColor100 =
+    hex "33A1FD"
 
 
 playerXColor =
