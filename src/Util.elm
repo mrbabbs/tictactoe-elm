@@ -18,3 +18,8 @@ viewIf content condition =
         content
     else
         text ""
+
+
+validateName : String -> Bool
+validateName name =
+    String.length name > 2
