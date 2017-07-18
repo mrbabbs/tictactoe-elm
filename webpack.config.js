@@ -1,5 +1,6 @@
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 const PRODUCTION = 'PRODUCTION';
 const environment = process.env.ENV || PRODUCTION
@@ -27,7 +28,7 @@ const cssLoaderDev = [
   'elm-css-webpack-loader'
 ];
 
-
+const uglify = new UglifyJSPlugin({ sourceMap: !isProd });
 
 module.exports = {
   entry: {
@@ -42,7 +43,7 @@ module.exports = {
     extensions: ['.js', '.elm'],
     modules: ['node_modules']
   },
-  plugins: [cssExtract],
+  plugins: [cssExtract, uglify],
   module: {
     rules: [
       {
