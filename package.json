@@ -12,9 +12,6 @@
   "author": "Giovanni Esposito <gioesps@gmail.com> (http://mrbabbs.com/)",
   "license": "MIT",
   "devDependencies": {
-    "babel-core": "^6.25.0",
-    "babel-loader": "^7.1.1",
-    "babel-preset-env": "^1.6.0",
     "css-loader": "^0.28.4",
     "elm": "^0.18.0",
     "elm-css": "^0.6.1",

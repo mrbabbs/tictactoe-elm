@@ -47,15 +47,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        exclude: [/elm-stuff/, /node_modules/, /\.elm$/],
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['env']
-          }
-        }
-      }, {
         test: /\.elm$/,
         exclude: [/elm-stuff/, /node_modules/, /Stylesheets\.elm$/],
         use: isProd? elmLoader : elmLoaderDev
