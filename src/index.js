@@ -1,5 +1,5 @@
-import Elm from './Main.elm'
-import Stylesheets from './Stylesheets.elm'
+const Elm = require('./Main.elm');
+const Stylesheets = require('./Stylesheets.elm');
 
 (function init() {
   const node = document.getElementById('main');
