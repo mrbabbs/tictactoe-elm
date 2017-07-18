@@ -54,23 +54,6 @@ type CssClasses
     | Link
 
 
-css =
-    (stylesheet << namespace appNamespace)
-        (List.concat
-            [ resetStyles
-            , continerStyle
-            , textFieldStyle
-            , vsLabelStyle
-            , newGameSubmit
-            , buttonStyle
-            , boardStyle
-            , leaderBoardStyle
-            , footerStyles
-            , linkStyles
-            ]
-        )
-
-
 type Transition
     = Property
     | Duration
@@ -82,6 +65,25 @@ appNamespace =
     "tictactoe"
 
 
+css : Stylesheet
+css =
+    (stylesheet << namespace appNamespace)
+        (List.concat
+            [ resetStyles
+            , continerStyles
+            , textFieldStyles
+            , vsLabelStyles
+            , newGameSubmits
+            , buttonStyles
+            , boardStyles
+            , leaderBoardStyles
+            , footerStyles
+            , linkStyles
+            ]
+        )
+
+
+transition : Transition -> String -> Style
 transition kind =
     case kind of
         Property ->
@@ -97,6 +99,7 @@ transition kind =
             property "transition-delay"
 
 
+resetStyles : List Snippet
 resetStyles =
     [ everything
         [ margin zero
@@ -139,7 +142,8 @@ resetStyles =
     ]
 
 
-continerStyle =
+continerStyles : List Snippet
+continerStyles =
     [ class Container
         [ displayFlex
         , flexDirection column
@@ -197,6 +201,7 @@ continerStyle =
     ]
 
 
+footerStyles : List Snippet
 footerStyles =
     [ class Footer
         [ flexGrow zero
@@ -213,6 +218,7 @@ footerStyles =
     ]
 
 
+linkStyles : List Snippet
 linkStyles =
     [ class Link
         [ color grayColor200
@@ -223,7 +229,8 @@ linkStyles =
     ]
 
 
-vsLabelStyle =
+vsLabelStyles : List Snippet
+vsLabelStyles =
     [ class VSLabel
         [ display inlineBlock
         , width (em 5)
@@ -234,11 +241,12 @@ vsLabelStyle =
     ]
 
 
-buttonStyle =
+buttonStyles : List Snippet
+buttonStyles =
     [ class Button
         [ backgroundColor blueColor100
         , padding (em 0.4)
-        , color white
+        , color whiteColor
         ]
     , class Button__FullWidth
         [ width (pct 100)
@@ -247,7 +255,8 @@ buttonStyle =
     ]
 
 
-leaderBoardStyle =
+leaderBoardStyles : List Snippet
+leaderBoardStyles =
     [ class LeaderBoard
         [ width (em 21)
         , displayFlex
@@ -264,7 +273,8 @@ leaderBoardStyle =
     ]
 
 
-boardStyle =
+boardStyles : List Snippet
+boardStyles =
     [ class Board
         [ maxWidth (em 25)
         , displayFlex
@@ -274,7 +284,7 @@ boardStyle =
         [ display block
         , width (em 7)
         , height (em 7)
-        , backgroundColor white
+        , backgroundColor whiteColor
         , nthChild "3n+1"
             [ borderRight3 borderTileWidth borderTileStyle borderTileColor
             ]
@@ -311,7 +321,8 @@ boardStyle =
     ]
 
 
-textFieldStyle =
+textFieldStyles : List Snippet
+textFieldStyles =
     [ class TextField
         [ display inlineBlock
         ]
@@ -329,7 +340,7 @@ textFieldStyle =
         , pseudoElement "placeholder"
             [ color grayColor200
             ]
-        , disabled [ backgroundColor white ]
+        , disabled [ backgroundColor whiteColor ]
         ]
     , class TextField_InputText__PlayerO
         [ focus
@@ -345,7 +356,8 @@ textFieldStyle =
     ]
 
 
-newGameSubmit =
+newGameSubmits : List Snippet
+newGameSubmits =
     [ class NewGameSubmit
         [ width (pct 100)
         , marginTop (em 1)
@@ -356,46 +368,52 @@ newGameSubmit =
     ]
 
 
-white =
+whiteColor : Color
+whiteColor =
     hex "ffffff"
 
 
+grayColor100 : Color
 grayColor100 =
     hex "eeeeee"
 
 
+grayColor200 : Color
 grayColor200 =
     hex "bbbbbb"
 
 
+greenColor100 : Color
 greenColor100 =
     hex "5dd39e"
 
 
+orangeColor100 : Color
 orangeColor100 =
     hex "f77022"
 
 
+blueColor100 : Color
 blueColor100 =
     hex "33A1FD"
 
 
+playerXColor : Color
 playerXColor =
     greenColor100
 
 
+playerOColor : Color
 playerOColor =
     orangeColor100
 
 
-lightKhaki =
-    hex "e6e18f"
-
-
+borderTileColor : Color
 borderTileColor =
     grayColor200
 
 
+borderTileWidth : Em
 borderTileWidth =
     em 0.05
 
