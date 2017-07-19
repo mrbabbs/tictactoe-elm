@@ -12,7 +12,7 @@ const elmLoader = [{
   }
 }];
 
-const cssExtract =new ExtractTextPlugin('bundle.css');
+const cssExtract =new ExtractTextPlugin('bundle.min.css');
 const elmLoaderDev = [{ loader: 'elm-hot-loader' }, ...elmLoader];
 
 const cssLoader = cssExtract.extract({
@@ -36,8 +36,8 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, './build'),
-    publicPath: "",
-    filename: "bundle.js"
+    publicPath: "/tictactoe-elm/",
+    filename: "bundle.min.js"
   },
   resolve: {
     extensions: ['.js', '.elm'],

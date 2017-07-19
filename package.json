@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "rm build/* && webpack --config webpack.config.js && cp src/index.html build/",
-    "start": "ENV=DEVELOP webpack-dev-server --config webpack.config.js",
+    "start": "webpack-dev-server --config webpack.config.js",
+    "start:dev": "ENV=DEVELOP webpack-dev-server --config webpack.config.js",
     "postinstall": "elm-package install -y",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
