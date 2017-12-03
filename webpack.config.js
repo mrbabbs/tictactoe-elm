@@ -36,14 +36,14 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, './build'),
-    publicPath: "/tictactoe-elm/",
+    publicPath: "/",
     filename: "bundle.min.js"
   },
   resolve: {
     extensions: ['.js', '.elm'],
     modules: ['node_modules']
   },
-  plugins: [cssExtract, uglify],
+  plugins: isProd ? [cssExtract, uglify] : [cssExtract],
   module: {
     rules: [
       {
