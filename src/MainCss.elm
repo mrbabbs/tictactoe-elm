@@ -285,6 +285,7 @@ boardStyles =
         , width (em 7)
         , height (em 7)
         , backgroundColor whiteColor
+        , borderRadius zero
         , nthChild "3n+1"
             [ borderRight3 borderTileWidth borderTileStyle borderTileColor
             ]
